@@ -7,8 +7,19 @@ import java.util.List;
 public class Article {
 
     @SerializedName("web_url")
-    String webUrl;
-    String snippet;
-    List<Multimedia> multimedia;
+    private String webUrl;
+    private Headline headline;
+    private List<Multimedia> multimedia;
 
+    public String getWebUrl() {
+        return webUrl;
+    }
+
+    public Headline getHeadline() {
+        return headline;
+    }
+
+    public List<Multimedia> getMultimedia() {
+        return multimedia;
+    }
 }

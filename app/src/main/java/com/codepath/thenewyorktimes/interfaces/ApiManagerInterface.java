@@ -1,11 +1,15 @@
 package com.codepath.thenewyorktimes.interfaces;
 
+import com.codepath.thenewyorktimes.models.SearchResults;
+
 import retrofit2.Call;
-import retrofit2.http.Field;
-import retrofit2.http.POST;
+import retrofit2.http.GET;
+import retrofit2.http.Query;
+
+import static com.codepath.thenewyorktimes.utils.Constants.SEARCH_ARTICLES;
 
 public interface ApiManagerInterface {
 
-    @POST("articlesearch.json/")
-    Call<String> getSearchArticle(@Field("api-key") String apiKey, @Field("page") String page, @Field("q") String q);
+    @GET(SEARCH_ARTICLES)
+    Call<SearchResults> getSearchArticles(@Query("api-key") String apiKey, @Query("q") String q);
 }
