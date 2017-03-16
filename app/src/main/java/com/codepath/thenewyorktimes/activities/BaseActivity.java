@@ -3,20 +3,20 @@ package com.codepath.thenewyorktimes.activities;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.codepath.thenewyorktimes.controllers.ApiManager;
-import com.codepath.thenewyorktimes.controllers.IApiManager;
+import com.codepath.thenewyorktimes.controllers.RetrofitClient;
+import com.codepath.thenewyorktimes.interfaces.NewYorkTimesClient;
 
 public class BaseActivity extends AppCompatActivity {
 
-    private IApiManager apiManager;
+    private NewYorkTimesClient newYorkTimesClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        apiManager = new ApiManager();
+        newYorkTimesClient = new RetrofitClient();
     }
 
-    public IApiManager getApiManager() {
-        return apiManager;
+    public NewYorkTimesClient getNewYorkTimesClient() {
+        return newYorkTimesClient;
     }
 }

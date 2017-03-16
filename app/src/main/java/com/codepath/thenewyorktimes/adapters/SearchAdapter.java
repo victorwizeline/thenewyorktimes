@@ -4,7 +4,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -12,15 +11,16 @@ import com.bumptech.glide.Glide;
 import com.codepath.thenewyorktimes.R;
 import com.codepath.thenewyorktimes.models.Article;
 import com.codepath.thenewyorktimes.models.Multimedia;
-import com.codepath.thenewyorktimes.models.SearchResults;
 import com.codepath.thenewyorktimes.utils.Utils;
+
+import java.util.List;
 
 public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder> {
 
-    private SearchResults searchResults;
+    private List<Article> articles;
 
-    public SearchAdapter(SearchResults searchResults) {
-        this.searchResults = searchResults;
+    public SearchAdapter(List<Article> articles) {
+        this.articles = articles;
     }
 
     @Override
@@ -31,32 +31,36 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.bind(searchResults.getResponse().getArticles().get(position));
+        holder.bind(articles.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return searchResults.getResponse().getArticles().size();
+        return articles.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView ivThumbnail;
-        TextView tvHeadline;
+        private ImageView ivThumbnail;
+        private TextView tvHeadline;
+        private TextView tvLeadParagraph;
 
         ViewHolder(View itemView) {
             super(itemView);
             ivThumbnail = (ImageView) itemView.findViewById(R.id.ivThumbnail);
             tvHeadline = (TextView) itemView.findViewById(R.id.tvHeadline);
+            tvLeadParagraph = (TextView) itemView.findViewById(R.id.tvLeadParagraph);
         }
 
         void bind(Article article) {
             tvHeadline.setText(article.getHeadline().getMain());
+            tvLeadParagraph.setText(article.getLeadParagraph());
             int size = Utils.getDisplayMetrics(itemView.getContext()).widthPixels / 2;
-            ivThumbnail.setLayoutParams(new FrameLayout.LayoutParams(size, size));
+            int unit = size / 190;
+            ivThumbnail.getLayoutParams().height = unit * 126;
             if (article.getMultimedia().size() > 0) {
                 for (Multimedia multimedia : article.getMultimedia()) {
-                    if (multimedia.getSubtype() != null && multimedia.getSubtype().equalsIgnoreCase("thumbnail")) {
+                    if (multimedia.getSubtype() != null && multimedia.getSubtype().equalsIgnoreCase("wide")) {
                         Glide.with(itemView.getContext()).load(multimedia.getUrl()).into(ivThumbnail);
                         break;
                     }
