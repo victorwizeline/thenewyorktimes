@@ -3,6 +3,7 @@ package com.codepath.thenewyorktimes.activities;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.Menu;
@@ -17,7 +18,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class SearchActivity extends BaseActivity implements Callback<SearchResults> {
+public class SearchActivity extends BaseActivity implements Callback<SearchResults>, SwipeRefreshLayout.OnRefreshListener {
 
     private ActivitySearchBinding binding;
 
@@ -25,6 +26,7 @@ public class SearchActivity extends BaseActivity implements Callback<SearchResul
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_search);
+        binding.swipeContainer.setOnRefreshListener(this);
         getNewYorkTimesClient().requestRecentArticles("0", this);
     }
 
@@ -51,11 +53,16 @@ public class SearchActivity extends BaseActivity implements Callback<SearchResul
 
     @Override
     public void onResponse(Call<SearchResults> call, Response<SearchResults> response) {
+        binding.swipeContainer.setRefreshing(false);
         binding.rvArticles.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         binding.rvArticles.setAdapter(new SearchAdapter(response.body().getResponse().getArticles()));
     }
 
     @Override
-    public void onFailure(Call<SearchResults> call, Throwable t) {
+    public void onFailure(Call<SearchResults> call, Throwable t) {}
+
+    @Override
+    public void onRefresh() {
+        getNewYorkTimesClient().requestRecentArticles("0", this);
     }
 }

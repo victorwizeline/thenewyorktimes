@@ -55,9 +55,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         void bind(Article article) {
             tvHeadline.setText(article.getHeadline().getMain());
             tvLeadParagraph.setText(article.getLeadParagraph());
-            int size = Utils.getDisplayMetrics(itemView.getContext()).widthPixels / 2;
-            int unit = size / 190;
-            ivThumbnail.getLayoutParams().height = unit * 126;
+            ivThumbnail.getLayoutParams().height = getScaledHeight();
             if (article.getMultimedia().size() > 0) {
                 for (Multimedia multimedia : article.getMultimedia()) {
                     if (multimedia.getSubtype() != null && multimedia.getSubtype().equalsIgnoreCase("wide")) {
@@ -66,6 +64,11 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
                     }
                 }
             }
+        }
+
+        int getScaledHeight() {
+            int totalWidth = Utils.getDisplayMetrics(itemView.getContext()).widthPixels;
+            return ((totalWidth / 2) / 16) * 9;
         }
     }
 }
