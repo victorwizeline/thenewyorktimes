@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -12,6 +13,7 @@ import com.codepath.thenewyorktimes.R;
 import com.codepath.thenewyorktimes.models.Article;
 import com.codepath.thenewyorktimes.models.Multimedia;
 import com.codepath.thenewyorktimes.models.SearchResults;
+import com.codepath.thenewyorktimes.utils.Utils;
 
 public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder> {
 
@@ -50,6 +52,8 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
 
         void bind(Article article) {
             tvHeadline.setText(article.getHeadline().getMain());
+            int size = Utils.getDisplayMetrics(itemView.getContext()).widthPixels / 2;
+            ivThumbnail.setLayoutParams(new FrameLayout.LayoutParams(size, size));
             if (article.getMultimedia().size() > 0) {
                 for (Multimedia multimedia : article.getMultimedia()) {
                     if (multimedia.getSubtype() != null && multimedia.getSubtype().equalsIgnoreCase("thumbnail")) {
