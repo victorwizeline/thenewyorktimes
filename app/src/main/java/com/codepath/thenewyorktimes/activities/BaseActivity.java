@@ -4,10 +4,11 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.codepath.thenewyorktimes.controllers.ApiManager;
+import com.codepath.thenewyorktimes.controllers.IApiManager;
 
 public class BaseActivity extends AppCompatActivity {
 
-    private ApiManager apiManager;
+    private IApiManager apiManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -15,7 +16,7 @@ public class BaseActivity extends AppCompatActivity {
         apiManager = new ApiManager();
     }
 
-    public ApiManager getApiManager() {
+    public IApiManager getApiManager() {
         return apiManager;
     }
 }
