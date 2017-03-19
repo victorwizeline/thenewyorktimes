@@ -1,6 +1,7 @@
 package com.codepath.thenewyorktimes.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,10 +11,15 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.codepath.thenewyorktimes.R;
+import com.codepath.thenewyorktimes.activities.WebViewActivity;
 import com.codepath.thenewyorktimes.models.Article;
 import com.codepath.thenewyorktimes.utils.Utils;
 
+import org.parceler.Parcels;
+
 import java.util.List;
+
+import static com.codepath.thenewyorktimes.utils.Constants.WEB_URL;
 
 public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder> {
 
@@ -37,6 +43,12 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         holder.tvLeadParagraph.setText(article.getLeadParagraph());
         holder.ivThumbnail.getLayoutParams().height = getScaledHeight(context);
         Glide.with(context).load(article.getWideImage()).placeholder(R.drawable.placeholder).into(holder.ivThumbnail);
+
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, WebViewActivity.class);
+            intent.putExtra(WEB_URL, article.getWebUrl());
+            context.startActivity(intent);
+        });
     }
 
     private int getScaledHeight(Context context) {
