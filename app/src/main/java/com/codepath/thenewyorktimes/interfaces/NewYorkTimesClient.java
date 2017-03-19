@@ -5,6 +5,5 @@ import com.codepath.thenewyorktimes.models.SearchResults;
 import retrofit2.Callback;
 
 public interface NewYorkTimesClient {
-    void requestSearchArticles(String q, String page, Callback<SearchResults> callback);
-    void requestRecentArticles(String page, Callback<SearchResults> callback);
+    void requestSearchArticles(String q, int page, Callback<SearchResults> callback);
 }

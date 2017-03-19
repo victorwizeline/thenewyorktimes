@@ -1,5 +1,6 @@
 package com.codepath.thenewyorktimes.models;
 
+import com.bumptech.glide.Glide;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -25,7 +26,16 @@ public class Article {
         return leadParagraph;
     }
 
-    public List<Multimedia> getMultimedia() {
+    private List<Multimedia> getMultimedia() {
         return multimedia;
+    }
+
+    public String getWideImage() {
+        for (Multimedia multimedia : getMultimedia()) {
+            if (multimedia.getSubtype() != null && multimedia.getSubtype().equalsIgnoreCase("wide")) {
+                return  multimedia.getUrl();
+            }
+        }
+        return "";
     }
 }
