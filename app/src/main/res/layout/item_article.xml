@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp"
-    android:orientation="vertical">
+    android:orientation="horizontal">
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="@color/colorDividers" />
 
     <LinearLayout
+
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:background="@android:color/white"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="12dp">
 
         <ImageView
             android:id="@+id/ivThumbnail"
@@ -25,13 +31,10 @@
             android:id="@+id/tvHeadline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingEnd="8dp"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:paddingStart="8dp"
             android:paddingTop="8dp"
             android:text="TextView"
-            android:textSize="16sp"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <TextView
@@ -39,11 +42,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="8dp"
-            android:paddingEnd="8dp"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:paddingStart="8dp"
-            android:text="TextView" />
+            android:text="TextView"
+            android:textSize="16sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="12dp"
+            android:background="@color/colorDividers" />
     </LinearLayout>
 
-</android.support.v7.widget.CardView>
+    <View
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="@color/colorDividers" />
+
+</LinearLayout>
+
+

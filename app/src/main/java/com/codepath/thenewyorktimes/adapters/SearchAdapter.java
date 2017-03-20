@@ -2,6 +2,7 @@ package com.codepath.thenewyorktimes.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,7 +41,9 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         Context context = holder.itemView.getContext();
         Article article = articles.get(position);
         holder.tvHeadline.setText(article.getHeadline().getMain());
+        holder.tvHeadline.setTypeface(Utils.getCheltenhamFont(holder.itemView.getContext()));
         holder.tvLeadParagraph.setText(article.getLeadParagraph());
+        holder.tvLeadParagraph.setTypeface(Utils.getGeorgiaFont(holder.itemView.getContext()));
         holder.ivThumbnail.getLayoutParams().height = getScaledHeight(context);
         Glide.with(context).load(article.getWideImage()).placeholder(R.drawable.placeholder).into(holder.ivThumbnail);
 

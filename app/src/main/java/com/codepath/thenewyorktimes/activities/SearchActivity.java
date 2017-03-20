@@ -3,7 +3,6 @@ package com.codepath.thenewyorktimes.activities;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -16,6 +15,7 @@ import com.codepath.thenewyorktimes.R;
 import com.codepath.thenewyorktimes.adapters.SearchAdapter;
 import com.codepath.thenewyorktimes.controllers.RetrofitClient;
 import com.codepath.thenewyorktimes.databinding.ActivitySearchBinding;
+import com.codepath.thenewyorktimes.fragments.FilterFragmentDialog;
 import com.codepath.thenewyorktimes.interfaces.InfiniteScrollListener;
 import com.codepath.thenewyorktimes.interfaces.NewYorkTimesClient;
 import com.codepath.thenewyorktimes.models.Article;
@@ -33,25 +33,35 @@ import static com.codepath.thenewyorktimes.utils.Constants.DEFAULT_PAGE;
 import static com.codepath.thenewyorktimes.utils.Constants.ITEMS_ON_PAGE;
 import static com.codepath.thenewyorktimes.utils.Constants.THRESHOLD;
 
-public class SearchActivity extends AppCompatActivity implements Callback<SearchResults>,
-        SwipeRefreshLayout.OnRefreshListener, InfiniteScrollListener {
+public class SearchActivity extends AppCompatActivity implements Callback<SearchResults>, InfiniteScrollListener {
 
     private List<Article> articles = new ArrayList<>();
+    private StaggeredGridLayoutManager layoutManager;
     private NewYorkTimesClient newYorkTimesClient;
     private InfiniteScroll infiniteScroll;
     private SearchAdapter searchAdapter;
     private ActivitySearchBinding bind;
-    private String currentQuery = "";
+    private String currentQuery = "today";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         bind = DataBindingUtil.setContentView(this, R.layout.activity_search);
-        bind.swipe.setOnRefreshListener(this);
+        setSupportActionBar(bind.toolbar);
+        setupControllers();
+        setupRecyclerView();
+
+        newYorkTimesClient.requestSearchArticles(currentQuery, 0, this);
+    }
+
+    private void setupControllers() {
         newYorkTimesClient = new RetrofitClient();
-        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2, VERTICAL);
+        layoutManager = new StaggeredGridLayoutManager(2, VERTICAL);
         searchAdapter = new SearchAdapter(articles);
         infiniteScroll = new InfiniteScroll(layoutManager, ITEMS_ON_PAGE, THRESHOLD, this);
+    }
+
+    private void setupRecyclerView() {
         bind.recycler.setLayoutManager(layoutManager);
         bind.recycler.setAdapter(searchAdapter);
         bind.recycler.addOnScrollListener(infiniteScroll);
@@ -66,20 +76,15 @@ public class SearchActivity extends AppCompatActivity implements Callback<Search
     @Override
     public void onResponse(Call<SearchResults> call, Response<SearchResults> response) {
         infiniteScroll.LoadFinished();
-        articles.addAll(response.body().getResponse().getArticles());
-        searchAdapter.notifyItemRangeInserted(searchAdapter.getItemCount(), response.body().getResponse().getArticles().size());
-        bind.swipe.setRefreshing(false);
+        if (response.body().getResponse() != null) {
+            articles.addAll(response.body().getResponse().getArticles());
+            searchAdapter.notifyItemRangeInserted(searchAdapter.getItemCount(), response.body().getResponse().getArticles().size());
+        }
     }
 
     @Override
     public void onFailure(Call<SearchResults> call, Throwable t) {
         Log.d(getClass().getSimpleName(), t.getMessage());
-        bind.swipe.setRefreshing(false);
-    }
-
-    @Override
-    public void onRefresh() {
-        resetSearch();
     }
 
     @Override
@@ -90,9 +95,13 @@ public class SearchActivity extends AppCompatActivity implements Callback<Search
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                searchView.clearFocus();
-                currentQuery = query;
-                resetSearch();
+                if (!infiniteScroll.isLoading()) {
+                    articles.clear();
+                    currentQuery = query;
+                    searchView.clearFocus();
+                    infiniteScroll.loadStarted();
+                    newYorkTimesClient.requestSearchArticles(currentQuery, DEFAULT_PAGE, SearchActivity.this);
+                }
                 return true;
             }
 
@@ -108,14 +117,10 @@ public class SearchActivity extends AppCompatActivity implements Callback<Search
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_filter:
+                FilterFragmentDialog filterFragmentDialog = new FilterFragmentDialog();
+                filterFragmentDialog.show(getSupportFragmentManager(), "filer_fragment");
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void resetSearch() {
-        infiniteScroll.loadStarted();
-        articles.clear();
-        newYorkTimesClient.requestSearchArticles(currentQuery, DEFAULT_PAGE, this);
     }
 }

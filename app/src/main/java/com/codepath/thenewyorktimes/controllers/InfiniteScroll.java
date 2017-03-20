@@ -45,4 +45,8 @@ public class InfiniteScroll extends RecyclerView.OnScrollListener {
     public void LoadFinished() {
         isLoading = false;
     }
+
+    public boolean isLoading() {
+        return isLoading;
+    }
 }
