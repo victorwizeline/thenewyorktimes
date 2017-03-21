@@ -42,6 +42,8 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         Article article = articles.get(position);
         holder.tvHeadline.setText(article.getHeadline().getMain());
         holder.tvHeadline.setTypeface(Utils.getCheltenhamFont(holder.itemView.getContext()));
+        holder.tvOriginal.setText(article.getByline().getOriginal());
+        holder.tvOriginal.setTypeface(Utils.getGeorgiaFont(holder.itemView.getContext()));
         holder.tvLeadParagraph.setText(article.getLeadParagraph());
         holder.tvLeadParagraph.setTypeface(Utils.getGeorgiaFont(holder.itemView.getContext()));
         holder.ivThumbnail.getLayoutParams().height = getScaledHeight(context);
@@ -68,12 +70,14 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
 
         ImageView ivThumbnail;
         TextView tvHeadline;
+        TextView tvOriginal;
         TextView tvLeadParagraph;
 
         ViewHolder(View itemView) {
             super(itemView);
             ivThumbnail = (ImageView) itemView.findViewById(R.id.ivThumbnail);
             tvHeadline = (TextView) itemView.findViewById(R.id.tvHeadline);
+            tvOriginal = (TextView) itemView.findViewById(R.id.tvOriginal);
             tvLeadParagraph = (TextView) itemView.findViewById(R.id.tvLeadParagraph);
         }
     }

@@ -31,6 +31,7 @@
             android:id="@+id/tvHeadline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingBottom="2dp"
             android:paddingTop="8dp"
             android:text="TextView"
             android:textColor="@android:color/black"
@@ -38,12 +39,20 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/tvOriginal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TextView"
+            android:textSize="12sp" />
+
+        <TextView
             android:id="@+id/tvLeadParagraph"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="8dp"
+            android:paddingTop="4dp"
             android:text="TextView"
-            android:textSize="16sp" />
+            android:textColor="@android:color/black" />
 
         <View
             android:layout_width="match_parent"

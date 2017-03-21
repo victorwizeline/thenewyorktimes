@@ -26,4 +26,14 @@ public class RetrofitClient implements NewYorkTimesClient {
     public void requestSearchArticles(String q, int page, Callback<SearchResults> callback) {
         newYorkTimesApi.requestSearchArticles(NYT_API_KEY, q, String.valueOf(page)).enqueue(callback);
     }
+
+    @Override
+    public void requestDefaultArticles(int page, Callback<SearchResults> callback) {
+        newYorkTimesApi.requestDefaultArticles(NYT_API_KEY, String.valueOf(page)).enqueue(callback);
+    }
+
+    @Override
+    public void requestFilteredArticles(String date, String sort, String desk, int page, Callback<SearchResults> callback) {
+        newYorkTimesApi.requestFilteredArticles(NYT_API_KEY, date, sort, desk, String.valueOf(page)).enqueue(callback);
+    }
 }
