@@ -62,6 +62,7 @@ public class SearchActivity extends AppCompatActivity implements Callback<Search
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         bind = DataBindingUtil.setContentView(this, R.layout.activity_search);
+        bind.toolbar.setTitle("");
         setSupportActionBar(bind.toolbar);
         setupControllers();
         setupRecyclerView();
