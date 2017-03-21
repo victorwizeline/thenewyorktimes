@@ -14,8 +14,8 @@ public interface NewYorkTimesApi {
     Call<SearchResults> requestDefaultArticles(@Query("api-key") String apiKey, @Query("page") String page);
 
     @GET(SEARCH_ARTICLES)
-    Call<SearchResults> requestSearchArticles(@Query("api-key") String apiKey, @Query("q") String q, @Query("page") String page);
+    Call<SearchResults> requestQueriedArticles(@Query("api-key") String apiKey, @Query("q") String q, @Query("page") String page);
 
     @GET(SEARCH_ARTICLES)
-    Call<SearchResults> requestFilteredArticles(@Query("api-key") String apiKey, @Query("begin_date") String beginDate, @Query("fq") String fq, @Query("sort") String sort, @Query("page") String page);
+    Call<SearchResults> requestFilteredArticles(@Query("api-key") String apiKey, @Query("begin_date") String beginDate, @Query("sort") String sort, @Query("fq") String fq, @Query("page") String page);
 }

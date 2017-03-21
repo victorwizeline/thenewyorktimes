@@ -3,17 +3,15 @@ package com.codepath.thenewyorktimes.controllers;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 
-import com.codepath.thenewyorktimes.interfaces.InfiniteScrollListener;
-
-public class InfiniteScroll extends RecyclerView.OnScrollListener {
+public class InfiniteScrollListener extends RecyclerView.OnScrollListener {
 
     private StaggeredGridLayoutManager layoutManager;
-    private InfiniteScrollListener listener;
+    private ScrollListener listener;
     private boolean isLoading = false;
     private int itemsOnPage = 0;
     private int threshold = 0;
 
-    public InfiniteScroll(StaggeredGridLayoutManager layoutManager, int itemsOnPage, int threshold, InfiniteScrollListener listener) {
+    public InfiniteScrollListener(StaggeredGridLayoutManager layoutManager, int itemsOnPage, int threshold, ScrollListener listener) {
         this.layoutManager = layoutManager;
         this.itemsOnPage = itemsOnPage;
         this.threshold = threshold;
@@ -48,5 +46,9 @@ public class InfiniteScroll extends RecyclerView.OnScrollListener {
 
     public boolean isLoading() {
         return isLoading;
+    }
+
+    public interface ScrollListener {
+        void onLoadMore(int page);
     }
 }

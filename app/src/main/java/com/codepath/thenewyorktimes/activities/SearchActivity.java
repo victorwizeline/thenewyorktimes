@@ -10,14 +10,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.codepath.thenewyorktimes.controllers.InfiniteScroll;
+import com.codepath.thenewyorktimes.controllers.InfiniteScrollListener;
 import com.codepath.thenewyorktimes.R;
 import com.codepath.thenewyorktimes.adapters.SearchAdapter;
 import com.codepath.thenewyorktimes.controllers.RetrofitClient;
 import com.codepath.thenewyorktimes.databinding.ActivitySearchBinding;
 import com.codepath.thenewyorktimes.fragments.FilterFragmentDialog;
 import com.codepath.thenewyorktimes.interfaces.FilterFragmentDialogListener;
-import com.codepath.thenewyorktimes.interfaces.InfiniteScrollListener;
 import com.codepath.thenewyorktimes.interfaces.NewYorkTimesClient;
 import com.codepath.thenewyorktimes.models.Article;
 import com.codepath.thenewyorktimes.models.SearchResults;
@@ -33,26 +32,27 @@ import static android.support.v7.widget.StaggeredGridLayoutManager.VERTICAL;
 import static com.codepath.thenewyorktimes.utils.Constants.DEFAULT_PAGE;
 import static com.codepath.thenewyorktimes.utils.Constants.ITEMS_ON_PAGE;
 import static com.codepath.thenewyorktimes.utils.Constants.THRESHOLD;
+import static com.codepath.thenewyorktimes.utils.Constants.TWO_COLUMS;
 
 public class SearchActivity extends AppCompatActivity implements Callback<SearchResults>,
-        InfiniteScrollListener, FilterFragmentDialogListener {
+        InfiniteScrollListener.ScrollListener, FilterFragmentDialogListener {
 
     private List<Article> articles = new ArrayList<>();
     private StaggeredGridLayoutManager layoutManager;
     private NewYorkTimesClient newYorkTimesClient;
-    private InfiniteScroll infiniteScroll;
+    private InfiniteScrollListener infiniteScrollListener;
     private SearchAdapter searchAdapter;
     private ActivitySearchBinding bind;
     private String currentQuery;
     private String date;
     private String sort;
     private String newsDesk;
-    private Type type;
+    private SearchType searchType;
 
-    private enum Type {
-        LAST_ITEMS,
-        SEARCH_ITEMS,
-        FILTERED_ITEMS
+    private enum SearchType {
+        DEFAULT,
+        QUERIED,
+        FILTERED
     }
 
     @Override
@@ -64,39 +64,39 @@ public class SearchActivity extends AppCompatActivity implements Callback<Search
         setupRecyclerView();
 
         articles.clear();
-        type = Type.LAST_ITEMS;
-        infiniteScroll.loadStarted();
-        newYorkTimesClient.requestDefaultArticles(DEFAULT_PAGE, this);
+        searchType = SearchType.DEFAULT;
+        infiniteScrollListener.loadStarted();
+        newYorkTimesClient.requestQueriedArticles(DEFAULT_PAGE, this);
     }
 
     private void setupControllers() {
         newYorkTimesClient = new RetrofitClient();
-        layoutManager = new StaggeredGridLayoutManager(2, VERTICAL);
+        layoutManager = new StaggeredGridLayoutManager(TWO_COLUMS, VERTICAL);
         searchAdapter = new SearchAdapter(articles);
-        infiniteScroll = new InfiniteScroll(layoutManager, ITEMS_ON_PAGE, THRESHOLD, this);
+        infiniteScrollListener = new InfiniteScrollListener(layoutManager, ITEMS_ON_PAGE, THRESHOLD, this);
     }
 
     private void setupRecyclerView() {
         bind.recycler.setLayoutManager(layoutManager);
         bind.recycler.setAdapter(searchAdapter);
-        bind.recycler.addOnScrollListener(infiniteScroll);
+        bind.recycler.addOnScrollListener(infiniteScrollListener);
     }
 
     @Override
     public void onLoadMore(int page) {
-        infiniteScroll.loadStarted();
-        if (type == Type.LAST_ITEMS) {
-            newYorkTimesClient.requestDefaultArticles(page, this);
-        } else if (type == Type.SEARCH_ITEMS) {
-            newYorkTimesClient.requestSearchArticles(currentQuery, page, this);
-        } else if (type == Type.FILTERED_ITEMS) {
+        infiniteScrollListener.loadStarted();
+        if (searchType == SearchType.DEFAULT) {
+            newYorkTimesClient.requestQueriedArticles(page, this);
+        } else if (searchType == SearchType.QUERIED) {
+            newYorkTimesClient.requestQueriedArticles(currentQuery, page, this);
+        } else if (searchType == SearchType.FILTERED) {
             newYorkTimesClient.requestFilteredArticles(date, sort, newsDesk, page, this);
         }
     }
 
     @Override
     public void onResponse(Call<SearchResults> call, Response<SearchResults> response) {
-        infiniteScroll.LoadFinished();
+        infiniteScrollListener.LoadFinished();
         articles.addAll(response.body().getResponse().getArticles());
         searchAdapter.notifyItemRangeInserted(searchAdapter.getItemCount(), response.body().getResponse().getArticles().size());
     }
@@ -114,14 +114,14 @@ public class SearchActivity extends AppCompatActivity implements Callback<Search
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                if (!infiniteScroll.isLoading()) {
+                if (!infiniteScrollListener.isLoading()) {
                     currentQuery = query;
                     searchView.clearFocus();
 
                     articles.clear();
-                    type = Type.SEARCH_ITEMS;
-                    infiniteScroll.loadStarted();
-                    newYorkTimesClient.requestSearchArticles(currentQuery, DEFAULT_PAGE, SearchActivity.this);
+                    searchType = SearchType.QUERIED;
+                    infiniteScrollListener.loadStarted();
+                    newYorkTimesClient.requestQueriedArticles(currentQuery, DEFAULT_PAGE, SearchActivity.this);
                 }
                 return true;
             }
@@ -148,14 +148,14 @@ public class SearchActivity extends AppCompatActivity implements Callback<Search
 
     @Override
     public void onFiltered(String date, String sort, String newsDesk) {
-        if (!infiniteScroll.isLoading()) {
+        if (!infiniteScrollListener.isLoading()) {
             this.date = date;
             this.sort = sort;
             this.newsDesk = newsDesk;
 
             articles.clear();
-            type = Type.FILTERED_ITEMS;
-            infiniteScroll.loadStarted();
+            searchType = SearchType.FILTERED;
+            infiniteScrollListener.loadStarted();
             newYorkTimesClient.requestFilteredArticles(date, sort, newsDesk, DEFAULT_PAGE, this);
         }
     }

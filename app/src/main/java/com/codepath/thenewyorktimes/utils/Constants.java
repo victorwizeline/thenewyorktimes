@@ -9,5 +9,6 @@ public class Constants {
     public final static String DATE_FORMAT = "MM/dd/yyyy";
     public final static int ITEMS_ON_PAGE = 10;
     public final static int DEFAULT_PAGE = 0;
+    public final static int TWO_COLUMS = 2;
     public final static int THRESHOLD = 0;
 }

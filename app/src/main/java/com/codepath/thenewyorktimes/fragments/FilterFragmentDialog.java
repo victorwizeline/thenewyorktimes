@@ -50,7 +50,7 @@ public class FilterFragmentDialog extends DialogFragment implements DatePickerDi
         });
         bind.spinner.setAdapter(ArrayAdapter.createFromResource(getContext(), R.array.sort_array, R.layout.spinner_item));
 
-        String date = String.format("%s%s%s", year, month, day);
+        @SuppressLint("DefaultLocale") String date = String.format("%04d%02d%02d", year, month, day);
         String sort = ((String) bind.spinner.getSelectedItem()).toLowerCase();
 
         bind.save.setOnClickListener(v -> {
