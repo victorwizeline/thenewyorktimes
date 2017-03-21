@@ -3,6 +3,7 @@ package com.codepath.thenewyorktimes.activities;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -21,6 +22,7 @@ import com.codepath.thenewyorktimes.interfaces.FilterFragmentDialogListener;
 import com.codepath.thenewyorktimes.interfaces.NewYorkTimesClient;
 import com.codepath.thenewyorktimes.models.Article;
 import com.codepath.thenewyorktimes.models.SearchResults;
+import com.codepath.thenewyorktimes.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +70,20 @@ public class SearchActivity extends AppCompatActivity implements Callback<Search
         searchType = SearchType.DEFAULT;
         infiniteScrollListener.loadStarted();
         bind.progressBar.setVisibility(View.VISIBLE);
-        newYorkTimesClient.requestQueriedArticles(DEFAULT_PAGE, this);
+        requestDefaultArticles();
+    }
+
+    private void requestDefaultArticles() {
+        if (Utils.isNetworkAvailable(this)) {
+            newYorkTimesClient.requestQueriedArticles(DEFAULT_PAGE, this);
+        } else {
+            new AlertDialog.Builder(this)
+                    .setTitle("Alert")
+                    .setMessage("To use this app is needed a internet connection")
+                    .setNegativeButton("Exit", (dialog, which) -> finish())
+                    .setPositiveButton("Retry", (dialog, which) -> requestDefaultArticles())
+                    .show();
+        }
     }
 
     private void setupControllers() {
@@ -87,12 +102,25 @@ public class SearchActivity extends AppCompatActivity implements Callback<Search
     @Override
     public void onLoadMore(int page) {
         infiniteScrollListener.loadStarted();
-        if (searchType == SearchType.DEFAULT) {
-            newYorkTimesClient.requestQueriedArticles(page, this);
-        } else if (searchType == SearchType.QUERIED) {
-            newYorkTimesClient.requestQueriedArticles(currentQuery, page, this);
-        } else if (searchType == SearchType.FILTERED) {
-            newYorkTimesClient.requestFilteredArticles(date, sort, newsDesk, page, this);
+        requestOnLoadMore(page);
+    }
+
+    private void requestOnLoadMore(int page) {
+        if (Utils.isNetworkAvailable(this)) {
+            if (searchType == SearchType.DEFAULT) {
+                newYorkTimesClient.requestQueriedArticles(page, this);
+            } else if (searchType == SearchType.QUERIED) {
+                newYorkTimesClient.requestQueriedArticles(currentQuery, page, this);
+            } else if (searchType == SearchType.FILTERED) {
+                newYorkTimesClient.requestFilteredArticles(date, sort, newsDesk, page, this);
+            }
+        } else {
+            new AlertDialog.Builder(this)
+                    .setTitle("Alert")
+                    .setMessage("To use this app is needed a internet connection")
+                    .setNegativeButton("Exit", (dialog, which) -> finish())
+                    .setPositiveButton("Retry", (dialog, which) -> requestOnLoadMore(page))
+                    .show();
         }
     }
 
@@ -126,7 +154,7 @@ public class SearchActivity extends AppCompatActivity implements Callback<Search
                 searchType = SearchType.QUERIED;
                 infiniteScrollListener.loadStarted();
                 bind.progressBar.setVisibility(View.VISIBLE);
-                newYorkTimesClient.requestQueriedArticles(currentQuery, DEFAULT_PAGE, SearchActivity.this);
+                requestQueriedArticles();
                 return true;
             }
 
@@ -136,6 +164,19 @@ public class SearchActivity extends AppCompatActivity implements Callback<Search
             }
         });
         return super.onCreateOptionsMenu(menu);
+    }
+
+    private void requestQueriedArticles() {
+        if (Utils.isNetworkAvailable(this)) {
+            newYorkTimesClient.requestQueriedArticles(currentQuery, DEFAULT_PAGE, SearchActivity.this);
+        } else {
+            new AlertDialog.Builder(this)
+                    .setTitle("Alert")
+                    .setMessage("To use this app is needed a internet connection")
+                    .setNegativeButton("Exit", (dialog, which) -> finish())
+                    .setPositiveButton("Retry", (dialog, which) -> requestQueriedArticles())
+                    .show();
+        }
     }
 
     @Override
@@ -160,6 +201,19 @@ public class SearchActivity extends AppCompatActivity implements Callback<Search
         searchType = SearchType.FILTERED;
         infiniteScrollListener.loadStarted();
         bind.progressBar.setVisibility(View.VISIBLE);
-        newYorkTimesClient.requestFilteredArticles(date, sort, newsDesk, DEFAULT_PAGE, this);
+        requestFilteredArticles();
+    }
+
+    private void requestFilteredArticles() {
+        if (Utils.isNetworkAvailable(this)) {
+            newYorkTimesClient.requestFilteredArticles(date, sort, newsDesk, DEFAULT_PAGE, this);
+        } else {
+            new AlertDialog.Builder(this)
+                    .setTitle("Alert")
+                    .setMessage("To use this app is needed a internet connection")
+                    .setNegativeButton("Exit", (dialog, which) -> finish())
+                    .setPositiveButton("Retry", (dialog, which) -> requestFilteredArticles())
+                    .show();
+        }
     }
 }
