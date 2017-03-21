@@ -31,7 +31,7 @@ public class InfiniteScrollListener extends RecyclerView.OnScrollListener {
             }
         }
 
-        if (lastVisibleItem + 1 >= itemsCount - threshold && !isLoading) {
+        if (lastVisibleItem + 1 >= itemsCount - threshold && itemsCount > 0 && !isLoading) {
             listener.onLoadMore(page);
         }
     }
@@ -42,10 +42,6 @@ public class InfiniteScrollListener extends RecyclerView.OnScrollListener {
 
     public void LoadFinished() {
         isLoading = false;
-    }
-
-    public boolean isLoading() {
-        return isLoading;
     }
 
     public interface ScrollListener {

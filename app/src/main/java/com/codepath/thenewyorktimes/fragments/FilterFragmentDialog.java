@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
+import android.widget.Toast;
 
 import com.codepath.thenewyorktimes.R;
 import com.codepath.thenewyorktimes.databinding.FragmentDialogFilterBinding;
@@ -19,6 +20,7 @@ import com.codepath.thenewyorktimes.interfaces.FilterFragmentDialogListener;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import static com.codepath.thenewyorktimes.utils.Constants.DATE_FORMAT;
 
@@ -26,6 +28,7 @@ public class FilterFragmentDialog extends DialogFragment implements DatePickerDi
 
     private FragmentDialogFilterBinding bind;
     private FilterFragmentDialogListener listener;
+    private Date date;
 
     @Nullable
     @Override
@@ -42,17 +45,10 @@ public class FilterFragmentDialog extends DialogFragment implements DatePickerDi
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-        bind.tvDate.setText(new SimpleDateFormat(DATE_FORMAT).format(calendar.getTime()));
-        bind.tvDate.setOnClickListener(v -> {
-            DatePickerDialog pickerDialog = new DatePickerDialog(getContext(), this, year, month, day);
-            pickerDialog.show();
-        });
+        date = calendar.getTime();
+        bind.tvDate.setText(new SimpleDateFormat(DATE_FORMAT).format(date));
+        bind.tvDate.setOnClickListener(v -> new DatePickerDialog(getContext(), this, year, month, day).show());
         bind.spinner.setAdapter(ArrayAdapter.createFromResource(getContext(), R.array.sort_array, R.layout.spinner_item));
-
-        @SuppressLint("DefaultLocale") String date = String.format("%04d%02d%02d", year, month, day);
-        String sort = ((String) bind.spinner.getSelectedItem()).toLowerCase();
-
         bind.save.setOnClickListener(v -> {
             String newsDesk = "";
             CheckBox[] checkBoxes = {bind.arts, bind.fashion, bind.sports};
@@ -61,15 +57,28 @@ public class FilterFragmentDialog extends DialogFragment implements DatePickerDi
                     newsDesk += String.format("\"%s\" ", checkBox.getText());
                 }
             }
+            if (newsDesk.length() < 1) {
+                Toast.makeText(getContext(), "Please select at least one category", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            calendar.setTime(date);
+            @SuppressLint("DefaultLocale")
+            String beginDate = String.format("%04d%02d%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+            String sort = ((String) bind.spinner.getSelectedItem()).toLowerCase();
             String fq = String.format("news_desk:(%s)", newsDesk);
-            listener.onFiltered(date, sort, fq);
+            listener.onFiltered(beginDate, sort, fq);
             dismiss();
         });
     }
 
     @Override
+    @SuppressLint({"DefaultLocale", "SimpleDateFormat"})
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-        bind.tvDate.setText(String.format("%s/%s/%s", month + 1, dayOfMonth, year));
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, dayOfMonth);
+        date = calendar.getTime();
+        bind.tvDate.setText(new SimpleDateFormat(DATE_FORMAT).format(date));
     }
 
     public void setListener(FilterFragmentDialogListener listener) {

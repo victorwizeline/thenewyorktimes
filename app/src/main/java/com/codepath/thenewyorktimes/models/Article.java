@@ -20,7 +20,6 @@ public class Article {
     @SerializedName("lead_paragraph")
     private String leadParagraph;
     private List<Multimedia> multimedia;
-    private Byline byline;
 
     public String getWebUrl() {
         return webUrl;
@@ -36,14 +35,6 @@ public class Article {
 
     private List<Multimedia> getMultimedia() {
         return multimedia;
-    }
-
-    public Byline getByline() {
-        if (byline != null){
-            return byline;
-        } else {
-            return new Byline();
-        }
     }
 
     public String getWideImage() {

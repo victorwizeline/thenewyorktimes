@@ -9,6 +9,7 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.codepath.thenewyorktimes.controllers.InfiniteScrollListener;
 import com.codepath.thenewyorktimes.R;
@@ -66,6 +67,7 @@ public class SearchActivity extends AppCompatActivity implements Callback<Search
         articles.clear();
         searchType = SearchType.DEFAULT;
         infiniteScrollListener.loadStarted();
+        bind.progressBar.setVisibility(View.VISIBLE);
         newYorkTimesClient.requestQueriedArticles(DEFAULT_PAGE, this);
     }
 
@@ -97,8 +99,11 @@ public class SearchActivity extends AppCompatActivity implements Callback<Search
     @Override
     public void onResponse(Call<SearchResults> call, Response<SearchResults> response) {
         infiniteScrollListener.LoadFinished();
-        articles.addAll(response.body().getResponse().getArticles());
-        searchAdapter.notifyItemRangeInserted(searchAdapter.getItemCount(), response.body().getResponse().getArticles().size());
+        bind.progressBar.setVisibility(View.GONE);
+        if (response.body().getResponse() != null) {
+            articles.addAll(response.body().getResponse().getArticles());
+        }
+        searchAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -114,15 +119,14 @@ public class SearchActivity extends AppCompatActivity implements Callback<Search
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                if (!infiniteScrollListener.isLoading()) {
-                    currentQuery = query;
-                    searchView.clearFocus();
+                currentQuery = query;
+                bind.toolbar.collapseActionView();
 
-                    articles.clear();
-                    searchType = SearchType.QUERIED;
-                    infiniteScrollListener.loadStarted();
-                    newYorkTimesClient.requestQueriedArticles(currentQuery, DEFAULT_PAGE, SearchActivity.this);
-                }
+                articles.clear();
+                searchType = SearchType.QUERIED;
+                infiniteScrollListener.loadStarted();
+                bind.progressBar.setVisibility(View.VISIBLE);
+                newYorkTimesClient.requestQueriedArticles(currentQuery, DEFAULT_PAGE, SearchActivity.this);
                 return true;
             }
 
@@ -140,7 +144,7 @@ public class SearchActivity extends AppCompatActivity implements Callback<Search
             case R.id.action_filter:
                 FilterFragmentDialog filterFragmentDialog = new FilterFragmentDialog();
                 filterFragmentDialog.setListener(this);
-                filterFragmentDialog.show(getSupportFragmentManager(), "filer_fragment");
+                filterFragmentDialog.show(getSupportFragmentManager(), "filter_fragment");
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -148,15 +152,14 @@ public class SearchActivity extends AppCompatActivity implements Callback<Search
 
     @Override
     public void onFiltered(String date, String sort, String newsDesk) {
-        if (!infiniteScrollListener.isLoading()) {
-            this.date = date;
-            this.sort = sort;
-            this.newsDesk = newsDesk;
+        this.date = date;
+        this.sort = sort;
+        this.newsDesk = newsDesk;
 
-            articles.clear();
-            searchType = SearchType.FILTERED;
-            infiniteScrollListener.loadStarted();
-            newYorkTimesClient.requestFilteredArticles(date, sort, newsDesk, DEFAULT_PAGE, this);
-        }
+        articles.clear();
+        searchType = SearchType.FILTERED;
+        infiniteScrollListener.loadStarted();
+        bind.progressBar.setVisibility(View.VISIBLE);
+        newYorkTimesClient.requestFilteredArticles(date, sort, newsDesk, DEFAULT_PAGE, this);
     }
 }
